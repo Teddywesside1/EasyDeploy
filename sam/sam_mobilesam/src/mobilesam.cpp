@@ -3,6 +3,7 @@
 #include "deploy_core/wrapper.h"
 
 #include <sched.h>
+#include <unistd.h>
 
 namespace sam {
 
