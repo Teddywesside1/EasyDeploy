@@ -1,22 +1,17 @@
-
 # Base image starts with CUDA
 ARG BASE_IMG=nvcr.io/nvidia/l4t-tensorrt:r8.5.2.2-devel
 FROM ${BASE_IMG} as base
 ENV BASE_IMG=nvcr.io/nvidia/l4t-tensorrt:r8.5.2.2-devel
 
-ENV TENSORRT_VERSION=8.5.2.2
-
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN rm /etc/apt/sources.list && \
-    echo "deb http://mirrors.ustc.edu.cn/ubuntu-ports/ focal main restricted universe multiverse" >> /etc/apt/sources.list && \
-    echo "deb http://mirrors.ustc.edu.cn/ubuntu-ports/ focal-security main restricted universe multiverse" >> /etc/apt/sources.list && \
-    echo "deb http://mirrors.ustc.edu.cn/ubuntu-ports/ focal-updates main restricted universe multiverse" >> /etc/apt/sources.list && \
-    echo "deb http://mirrors.ustc.edu.cn/ubuntu-ports/ focal-backports main restricted universe multiverse" >> /etc/apt/sources.list && \
+    echo "deb https://mirrors.ustc.edu.cn/ubuntu-ports/ focal main restricted universe multiverse" >> /etc/apt/sources.list && \
+    echo "deb https://mirrors.ustc.edu.cn/ubuntu-ports/ focal-security main restricted universe multiverse" >> /etc/apt/sources.list && \
+    echo "deb https://mirrors.ustc.edu.cn/ubuntu-ports/ focal-updates main restricted universe multiverse" >> /etc/apt/sources.list && \
+    echo "deb https://mirrors.ustc.edu.cn/ubuntu-ports/ focal-backports main restricted universe multiverse" >> /etc/apt/sources.list && \
     apt-get update
-
-
-# Install basic dependencies
+    
 RUN apt install -y \
     build-essential \
     manpages-dev \
@@ -41,34 +36,23 @@ RUN apt install -y \
     liblzma-dev \
     mecab-ipadic-utf8 \
     libopencv-dev \
-    cmake 
+    libeigen3-dev \
+    libgtest-dev 
 
-# install cmake-3.22.6
+# cmake
 RUN cd /tmp && \
-    wget https://gh.api.99988866.xyz/https://github.com/Kitware/CMake/releases/download/v3.22.6/cmake-3.22.6.tar.gz && \
-    tar -xzvf cmake-3.22.6.tar.gz && \
-    rm cmake-3.22.6.tar.gz
-RUN cd /tmp/cmake-3.22.6/ && \
-    ./configure && \
-    make -j4 && \
-    make install
+    wget https://gp.zz990099.cn/https://github.com/Kitware/CMake/releases/download/v3.22.3/cmake-3.22.3-linux-aarch64.tar.gz && \
+    tar -xzvf cmake-3.22.3-linux-aarch64.tar.gz && \
+    mv cmake-3.22.3-linux-aarch64 /opt/cmake-3.22.3 && \
+    rm cmake-3.22.3-linux-aarch64.tar.gz && \
+    rm /usr/local/bin/cmake && \
+    ln -s /opt/cmake-3.22.3/bin/cmake /usr/local/bin/cmake
 
-# install glog
+# glog
 RUN cd /tmp && \
-    wget https://gh.api.99988866.xyz/https://github.com/google/glog/archive/refs/tags/v0.5.0.tar.gz && \
-    tar -xzvf v0.5.0.tar.gz && \
-    rm v0.5.0.tar.gz
-RUN cd /tmp/glog-0.5.0 && \
+    wget https://gp.zz990099.cn/https://github.com/google/glog/archive/refs/tags/v0.7.0.tar.gz && \
+    tar -xzvf v0.7.0.tar.gz && \
+    cd glog-0.7.0 && \
     mkdir build && cd build && \
-    cmake .. && make -j4 && \
-    make install
-
-# install gtest
-RUN cd /tmp && \
-    wget https://gh.api.99988866.xyz/https://github.com/google/googletest/archive/refs/tags/release-1.11.0.tar.gz && \
-    tar -xzvf release-1.11.0.tar.gz && \
-    rm release-1.11.0.tar.gz
-RUN cd /tmp/googletest-release-1.11.0 && \
-    mkdir build && cd build && \
-    cmake .. && make -j4 && \
+    cmake .. && make -j && \
     make install
